@@ -21,11 +21,11 @@ just exec-bench $NAMESPACE
 ```bash
 MODEL=RedHatAI/Llama-3.3-70B-Instruct-FP8-dynamic
 NAMESPACE=test
-GATEWAY_URL=http://10.16.0.216
+URL=http://YOUR_SVC_URL:8000
 CONCURRENT=100
 LIMIT=1000
 
-just eval $MODEL $GATEWAY_URL $CONCURRENT $LIMIT
+just eval $MODEL $URL $CONCURRENT $LIMIT
 
 >> |Tasks|Version|     Filter     |n-shot|  Metric   |   |Value|   |Stderr|
 >> |-----|------:|----------------|-----:|-----------|---|----:|---|-----:|
@@ -39,11 +39,11 @@ just eval $MODEL $GATEWAY_URL $CONCURRENT $LIMIT
 
 ```bash
 MODEL=RedHatAI/Llama-3.3-70B-Instruct-FP8-dynamic
-NAMESPACE=llm-d
-GATEWAY_URL=http://10.16.0.216
+NAMESPACE=test
+URL=http://YOUR_SERVICE_URL:8000
 OUTFILE=results.json
 
-just sweep $OUTFILE $GATEWAY_URL
+just sweep $OUTFILE $URL
 ```
 
 - You can copy over the results with:
