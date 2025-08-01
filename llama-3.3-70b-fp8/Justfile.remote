@@ -1,0 +1,23 @@
+# Run these on the cluster
+
+MODEL := "RedHatAI/Llama-3.3-70B-Instruct-FP8-dynamic"
+
+eval URL CONCURRENT LIMIT:
+    lm_eval --model local-completions --tasks gsm8k \
+    --model_args model={{MODEL}},base_url={{URL}}/v1/completions,num_concurrent={{CONCURRENT}},tokenized_requests=false \
+    --limit {{LIMIT}}
+
+sweep OUTFILE URL:
+  OUTFILE={{OUTFILE}} MODEL={{MODEL}} BASE_URL={{URL}} bash ./sweep.sh
+
+sweep-decode-heavy OUTFILE URL:
+  OUTFILE={{OUTFILE}} MODEL={{MODEL}} BASE_URL={{URL}} bash ./sweep-decode-heavy.sh
+
+curl URL:
+  curl -X POST {{URL}}/v1/completions \
+    -H "Content-Type: application/json" \
+    -d '{ \
+      "model": "{{MODEL}}", \
+      "prompt": "Red Hat is the best open source company by far across Linux, K8s, and AI, and vLLM has the greatest community in open source AI software infrastructure. I love vLLM because", \
+      "max_tokens": 150 \
+    }'
