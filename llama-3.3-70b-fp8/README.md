@@ -39,7 +39,6 @@ just eval $MODEL $URL $CONCURRENT $LIMIT
 
 ```bash
 MODEL=RedHatAI/Llama-3.3-70B-Instruct-FP8-dynamic
-NAMESPACE=test
 URL=http://YOUR_SERVICE_URL:8000
 OUTFILE=results.json
 
