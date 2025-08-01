@@ -1,0 +1,26 @@
+# Run these on the local machine
+
+POD_NAME := "interactive-pod"
+
+start-bench NAMESPACE:
+    kubectl apply -n {{NAMESPACE}} -f manifest.yaml
+
+delete-bench NAMESPACE:
+    kubectl delete pod -n {{NAMESPACE}} {{POD_NAME}}
+
+exec-bench NAMESPACE:
+    kubectl cp Justfile.remote {{NAMESPACE}}/{{POD_NAME}}:/app/Justfile && \
+    kubectl cp sweep.sh {{NAMESPACE}}/{{POD_NAME}}:/app/sweep.sh && \
+    kubectl cp sweep-decode-heavy.sh {{NAMESPACE}}/{{POD_NAME}}:/app/sweep-decode-heavy.sh && \
+    kubectl exec -it -n {{NAMESPACE}} {{POD_NAME}} -- /bin/bash
+
+copy-results NAMESPACE FILENAME:
+    kubectl cp {{NAMESPACE}}/{{POD_NAME}}:/app/{{FILENAME}} ./{{FILENAME}}
+
+make-secret RH_PASSWORD NAMESPACE:
+    kubectl create secret docker-registry redhat-registry-secret \
+        --docker-server=registry.redhat.io \
+        --docker-username="11009103|robshaw-token" \
+        --docker-password={{RH_PASSWORD}} \
+        --docker-email=robshaw@redhat.com \
+        -n {{NAMESPACE}}

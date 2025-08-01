@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sgl
+  namespace: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: sgl
+  template:
+    metadata:
+      labels:
+        name: sgl
+    spec:
+      containers:
+        - name: sgl
+          image: "docker.io/lmsysorg/sglang:v0.4.9.post6-cu126"
+          imagePullPolicy: Always
+          command: ["python3", "-m", "sglang.launch_server"]
+          args:
+          - "--model-path"
+          - "unsloth/Llama-3.3-70B-Instruct"
+          - "--host"
+          - "0.0.0.0"
+          - "--port"
+          - "8000"
+          - "--tp"
+          - "4"
+          - "--context-length"
+          - "32000"
+          ports:
+            - containerPort: 8000
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "16"
+              memory: 128Gi
+              nvidia.com/gpu: 4
+            requests:
+              cpu: "16"
+              memory: 128Gi
+              nvidia.com/gpu: 4
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: shm
+      volumes:
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: "16Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sgl
+  namespace: test
+spec:
+  type: ClusterIP
+  selector:
+    name: sgl
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
