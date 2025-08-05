@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: vllm-model
+  name: rhoai
   namespace: test
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: vllm-model
+      name: rhoai
   template:
     metadata:
       labels:
-        name: vllm-model
+        name: rhoai
     spec:
       containers:
-        - name: vllm-model
-          image: "docker.io/vllm/vllm-openai:v0.9.2"
+        - name: rhoai
+          image: "quay.io/modh/vllm:rhoai-2.23-cuda"
           imagePullPolicy: Always
           command: ["/bin/sh", "-c"]
           args: [
@@ -34,12 +34,18 @@ spec:
               cpu: "16"
               memory: 128Gi
               nvidia.com/gpu: 4
-            env:
-            - name: VLLM_TORCH_PROFILER_DIR
-              value: "/code/traces"
           volumeMounts:
             - mountPath: /dev/shm
               name: shm
+          env:
+            - name: HF_HUB_OFFLINE
+              value: "0"
+            - name: HF_HUB_DISABLE_XET
+              value: "1"
+            - name: HF_HUB_ENABLE_HF_TRANSFER
+              value: "0"
+      imagePullSecrets:
+        - name: redhat-registry-secret
       volumes:
         - name: shm
           emptyDir:
@@ -49,12 +55,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: vllm-model
+  name: rhoai
   namespace: test
 spec:
   type: ClusterIP
   selector:
-    name: vllm-model
+    name: rhoai
   ports:
     - name: http
       protocol: TCP
